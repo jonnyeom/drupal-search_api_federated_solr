@@ -3,6 +3,7 @@
 namespace Drupal\search_api_federated_solr\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\search_api\Entity\Server;
 use Drupal\search_api\SearchApiException;
 use Drupal\search_api_federated_solr\Utility\Helpers;
@@ -70,7 +71,13 @@ class SolrProxyController extends ControllerBase {
         $federated_search_index = $indexes[$index_id];
 
         // Get index field names mapped to their solr field name counterparts
-        $backend_field_names_map = $backend->getSolrFieldNames($federated_search_index);
+        // for the current language.
+        // @Todo: Implement a dynamic field names based on index settings.
+        $language_id = \Drupal::languageManager()
+          ->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)
+          ->getId();
+        $backend_field_names_map = $backend->getLanguageSpecificSolrFieldNames($language_id, $federated_search_index);
+
         // Get all full text fields from the index.
         $full_text_fields = $federated_search_index->getFulltextFields();
         // We can only search full text fields, so validate supplied field names.
