@@ -106,7 +106,11 @@ class FederatedTerms extends ProcessorPluginBase {
           // Get the term's field definitions.
           $field_definitions = $term_entity->getFieldDefinitions();
           $federated_term_definitions = array_filter($field_definitions, function ($field_definition) {
-            return $field_definition->getType() === "federated_terms";
+            $custom_fields = [
+              'field_search_facet_subtopic',
+              'field_search_facet_topic',
+            ];
+            return $field_definition->getType() === "federated_terms" && !in_array($field_definition->getName(), $custom_fields, TRUE);
           });
 
           /* Since we don't know the field name which was added,
